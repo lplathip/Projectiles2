@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to the Application</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        text-align: center;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
+      p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+      }
+      .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+      }
+      .button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Projectiles</h1>
+      <p>Please select the page you want to see:</p>
+      <div class="button-container">
+        <a class="button" href="{{url_for('index_1')}}"
+          >Air Resistance and Launch Height</a
+        >
+        <a class="button" href="{{url_for('index_2')}}"
+          >High Low Ball & Bounding Parabola</a
+        >
+        <a class="button" href="{{url_for('index_3')}}">Range-Time Graph</a>
+        <a class="button" href="{{url_for('index_4')}}">COR</a>
+      </div>
+    </div>
+  </body>
+</html>

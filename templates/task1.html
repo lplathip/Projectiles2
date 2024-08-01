@@ -1,0 +1,67 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>Projectile Motion</title>         
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>         
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>         
+        <style>.slider-container { margin: 20px 0; } .slider-label { display: inline-block; width: 150px; }</style>         
+    </head>     
+    <body> 
+        <h1>Drag-Free Projectile Motion</h1>
+        <h1>Challenge #1: Create a simple model of drag-free projectile
+motion in a spreadsheet or via a programming language. Inputs
+are: launch angle from horizontal , strength of gravity g,
+launch speed u and launch height h. Use a fixed increment of
+time. The graph must automatically update when inputs are
+changed.</h1> 
+        <div class="slider-container"> 
+            <label class="slider-label" for="speed">Launch Speed (u):</label>             
+            <input type="range" id="speed" name="speed" min="1" max="100" step="1" value="20"> <span id="speedValue">20</span> 
+        </div>         
+        <div class="slider-container"> 
+            <label class="slider-label" for="angle">Launch Angle (θ):</label>             
+            <input type="range" id="angle" name="angle" min="0" max="90" step="1" value="60"> <span id="angleValue">60</span> 
+        </div>         
+        <div class="slider-container"> 
+            <label class="slider-label" for="gravity">Gravity (g):</label>             
+            <input type="range" id="gravity" name="gravity" min="1" max="20" step="0.1" value="9.81"> <span id="gravityValue">9.81</span> 
+        </div>         
+        <div class="slider-container"> 
+            <label class="slider-label" for="height">Launch Height (h):</label>             
+            <input type="range" id="height" name="height" min="0" max="100" step="1" value="10"> <span id="heightValue">10</span> 
+        </div>         
+        <div id="graph"></div>         
+        <script>
+        function updateGraph() {
+            var formData = {
+                speed: $('#speed').val(),
+                angle: $('#angle').val(),
+                gravity: $('#gravity').val(),
+                height: $('#height').val()
+            };
+            $.ajax({
+                type: 'POST',
+                url: '/update_1',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(data) {
+                    var graph = JSON.parse(data);
+                    Plotly.newPlot('graph', graph.data, graph.layout);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            $('input[type="range"]').on('input', function() {
+                var id = $(this).attr('id');
+                $('#' + id + 'Value').text($(this).val());
+                updateGraph();
+            });
+
+            updateGraph(); // Initial graph update on page load
+        });
+    </script>         
+    </body>     
+</html>
