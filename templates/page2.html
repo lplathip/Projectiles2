@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .slider-container {
+        margin: 20px 0;
+      }
+      .slider {
+        width: 100%;
+      }
+      .button {
+        font-family: Arial, sans-serif;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="margin: 2rem">
+      <a class="button" href="{{url_for('home')}}">Back to Home</a>
+    </div>
+    <h1>Projectile Trajectories</h1>
+    <form id="form">
+      <div class="slider-container">
+        <label for="X">Target X (m): <span id="X_val">{{ X }}</span></label>
+        <input
+          type="range"
+          min="500"
+          max="2000"
+          value="{{ X }}"
+          class="slider"
+          id="X"
+          name="X"
+          step="50"
+          oninput="updateValue(this, 'X_val')"
+        />
+      </div>
+      <div class="slider-container">
+        <label for="Y">Target Y (m): <span id="Y_val">{{ Y }}</span></label>
+        <input
+          type="range"
+          min="100"
+          max="1000"
+          value="{{ Y }}"
+          class="slider"
+          id="Y"
+          name="Y"
+          step="50"
+          oninput="updateValue(this, 'Y_val')"
+        />
+      </div>
+      <div class="slider-container">
+        <label for="g">Gravity (m/s²): <span id="g_val">{{ g }}</span></label>
+        <input
+          type="range"
+          min="1"
+          max="20"
+          value="{{ g }}"
+          class="slider"
+          id="g"
+          name="g"
+          step="0.1"
+          oninput="updateValue(this, 'g_val')"
+        />
+      </div>
+      <div class="slider-container">
+        <label for="u"
+          >Launch Speed (m/s): <span id="u_val">{{ u }}</span></label
+        >
+        <input
+          type="range"
+          min="50"
+          max="300"
+          value="{{ u }}"
+          class="slider"
+          id="u"
+          name="u"
+          step="10"
+          oninput="updateValue(this, 'u_val')"
+        />
+      </div>
+    </form>
+    <div id="plot"></div>
+
+    <script>
+      function updateValue(slider, spanId) {
+        document.getElementById(spanId).innerText = slider.value;
+        updatePlot();
+      }
+
+      async function updatePlot() {
+        const X = document.getElementById("X").value;
+        const Y = document.getElementById("Y").value;
+        const g = document.getElementById("g").value;
+        const u = document.getElementById("u").value;
+
+        const response = await fetch("/update_plot_2", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ X, Y, g, u }),
+        });
+
+        const data = await response.json();
+        const plot = JSON.parse(data.plot);
+        Plotly.react("plot", plot.data, plot.layout);
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        updatePlot();
+      });
+    </script>
+  </body>
+</html>

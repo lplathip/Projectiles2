@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Load Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start; /* Changed from center to flex-start */
+        height: 100vh;
+        margin: 0;
+        padding-top: 150px; /* Increased top padding to move content down */
+      }
+      #plot1,
+      #plot2 {
+        width: 80%;
+        margin-bottom: 20px;
+      }
+      .slider-container {
+        width: 80%;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .slider {
+        width: 100%;
+      }
+      .button {
+        font-family: Arial, sans-serif;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="margin: 2rem">
+      <a class="button" href="{{url_for('home')}}">Back to Home</a>
+    </div>
+    <div class="slider-container">
+      <!-- Slider for blue trajectory -->
+      <input
+        class="slider"
+        id="angle-slider-blue"
+        type="range"
+        min="0"
+        max="90"
+        step="1"
+        value="60"
+        oninput="updatePlot()"
+      />
+      <span id="angle-value-blue">Angle (Blue): 60 degrees</span>
+    </div>
+
+    <div class="slider-container">
+      <!-- Slider for green trajectory -->
+      <input
+        class="slider"
+        id="angle-slider-green"
+        type="range"
+        min="0"
+        max="90"
+        step="1"
+        value="70"
+        oninput="updatePlot()"
+      />
+      <span id="angle-value-green">Angle (Green): 70 degrees</span>
+    </div>
+
+    <div class="slider-container">
+      <!-- Slider for red trajectory -->
+      <input
+        class="slider"
+        id="angle-slider-red"
+        type="range"
+        min="0"
+        max="90"
+        step="1"
+        value="85"
+        oninput="updatePlot()"
+      />
+      <span id="angle-value-red">Angle (Red): 85 degrees</span>
+    </div>
+
+    <div class="slider-container">
+      <!-- Slider for yellow trajectory -->
+      <input
+        class="slider"
+        id="angle-slider-yellow"
+        type="range"
+        min="0"
+        max="90"
+        step="1"
+        value="45"
+        oninput="updatePlot()"
+      />
+      <span id="angle-value-yellow">Angle (Yellow): 45 degrees</span>
+    </div>
+
+    <div class="slider-container">
+      <!-- Slider for speed -->
+      <input
+        class="slider"
+        id="speed-slider"
+        type="range"
+        min="1"
+        max="20"
+        step="1"
+        value="10"
+        oninput="updatePlot()"
+      />
+      <span id="speed-value">Speed: 10 m/s</span>
+    </div>
+
+    <!-- Plotly graph for range vs time -->
+    <div id="plot1"></div>
+
+    <!-- Plotly graph for vertical vs horizontal displacement -->
+    <div id="plot2"></div>
+
+    <script>
+      // Function to fetch initial plot data and initialize Plotly plot
+      function initializePlot() {
+        fetch("/initial_plot_data")
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            Plotly.newPlot(
+              "plot1",
+              JSON.parse(data.plot1),
+              {},
+              { responsive: true }
+            );
+            Plotly.newPlot(
+              "plot2",
+              JSON.parse(data.plot2),
+              {},
+              { responsive: true }
+            );
+          });
+      }
+
+      // Initialize the plot when the page loads
+      window.onload = function () {
+        initializePlot(); // Call the function to initialize plot
+        updatePlot(); // Update plot with default angles
+      };
+
+      // Function to update the plot based on slider values
+      function updatePlot() {
+        var angleBlue = document.getElementById("angle-slider-blue").value;
+        var angleGreen = document.getElementById("angle-slider-green").value;
+        var angleRed = document.getElementById("angle-slider-red").value;
+        var angleYellow = document.getElementById("angle-slider-yellow").value;
+        var speed = document.getElementById("speed-slider").value;
+
+        document.getElementById("angle-value-blue").innerText =
+          "Angle (Blue): " + angleBlue + " degrees";
+        document.getElementById("angle-value-green").innerText =
+          "Angle (Green): " + angleGreen + " degrees";
+        document.getElementById("angle-value-red").innerText =
+          "Angle (Red): " + angleRed + " degrees";
+        document.getElementById("angle-value-yellow").innerText =
+          "Angle (Yellow): " + angleYellow + " degrees";
+        document.getElementById("speed-value").innerText =
+          "Speed: " + speed + " m/s";
+
+        fetch("/update_plot_3", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            angle_blue: angleBlue,
+            angle_green: angleGreen,
+            angle_red: angleRed,
+            angle_yellow: angleYellow,
+            speed: speed,
+          }),
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            Plotly.react("plot1", JSON.parse(data.plot1));
+            Plotly.react("plot2", JSON.parse(data.plot2));
+          });
+      }
+    </script>
+  </body>
+</html>
