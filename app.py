@@ -52,7 +52,11 @@ def update_1():
     fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='lines', name='Trajectory'))
     fig.update_layout(title='Simple Projectile Motion Model',
                       xaxis_title='x (m)',
-                      yaxis_title='y (m)')
+                      yaxis_title='y (m)',
+                      paper_bgcolor='#26252C', 
+                      plot_bgcolor='#26252C',
+                      font=dict(color='white'))
+
     graphJSON = pio.to_json(fig)
     return jsonify(graphJSON)
 
@@ -92,7 +96,10 @@ def update_2():
     fig.add_trace(go.Scatter(x=[xa], y=[ya], mode='markers', name='Apogee', marker=dict(color='red', size=10)))
     fig.update_layout(title='Exact Projectile Motion Model',
                       xaxis_title='x (m)',
-                      yaxis_title='y (m)')
+                      yaxis_title='y (m)',
+                      paper_bgcolor='#26252C', 
+                      plot_bgcolor='#26252C',
+                      font=dict(color='white'))
     graphJSON = pio.to_json(fig)
     return jsonify(graphJSON=graphJSON, time_of_flight=T)
 
@@ -191,6 +198,9 @@ def plot_projectile_trajectories_3(X=1000, Y=300, h=0, g=9.81, u=150):
         title='High/Low Ball & Minimum Speed to Target Point',
         xaxis_title='Horizontal Distance (m)',
         yaxis_title='Vertical Distance (m)',
+                      paper_bgcolor='#26252C', 
+                      plot_bgcolor='#26252C',
+                      font=dict(color='white'),
         legend=dict(
             orientation='h',
             yanchor='bottom',
@@ -286,7 +296,10 @@ def update_4():
     fig.add_trace(go.Scatter(x=[xa], y=[ya], mode='markers', name='Apogee', marker=dict(color='red', size=10)))
     fig.update_layout(title='Exact Projectile Motion Model',
                       xaxis_title='x (m)',
-                      yaxis_title='y (m)')
+                      yaxis_title='y (m)',
+                      paper_bgcolor='#26252C', 
+                      plot_bgcolor='#26252C',
+                      font=dict(color='white'))
     graphJSON = pio.to_json(fig)
     return jsonify(
         graphJSON=graphJSON,
@@ -443,8 +456,21 @@ def update_7():
         x2, y2 = calculate_displacements_7(t2, theta)
         
         if len(x1) > 0 and len(y1) > 0 and len(x2) > 0 and len(y2) > 0:
-            fig1.add_trace(go.Scatter(x=[t1, t2], y=[r1, r2], mode='markers', name=f'Angle = {angle}° Min Max Height', marker=dict(size=10, color='black')))
-            fig2.add_trace(go.Scatter(x=[x1[0], x2[0]], y=[y1[0], y2[0]], mode='markers', name=f'Angle = {angle}° Min Max Height', marker=dict(size=10, color='black')))
+            fig1.add_trace(go.Scatter(x=[t1, t2], y=[r1, r2], mode='markers', name=f'Angle = {angle}° Min Max Height', marker=dict(size=10, color='white')))
+            fig2.add_trace(go.Scatter(x=[x1[0], x2[0]], y=[y1[0], y2[0]], mode='markers', name=f'Angle = {angle}° Min Max Height', marker=dict(size=10, color='white')))
+        
+            fig1.update_layout(
+                paper_bgcolor='#26252C',  # Background color of the entire paper
+                plot_bgcolor='#26252C',   # Background color of the plot area
+                font=dict(color='white')  # Font color
+            )
+
+            # Update layout for fig2
+            fig2.update_layout(
+                paper_bgcolor='#26252C',  # Background color of the entire paper
+                plot_bgcolor='#26252C',   # Background color of the plot area
+                font=dict(color='white')  # Font color
+            )
 
             # Print min max points for X-Y graph
             print(f"Angle = {angle}°, Point 1: ({x1[0]}, {y1[0]}), Point 2: ({x2[0]}, {y2[0]})")
@@ -551,7 +577,10 @@ def update_9():
     fig.add_trace(go.Scatter(x=x_data_red, y=y_data_red, mode='lines', name='Red trajectory (Formula angle)', line=dict(color='red')))
     fig.update_layout(title='Projectile Motion with and without Air Resistance',
                       xaxis_title='x /m',
-                      yaxis_title='y /m')
+                      yaxis_title='y /m',
+                      paper_bgcolor='#26252C', 
+                      plot_bgcolor='#26252C',
+                      font=dict(color='white'))
     graphJSON = pio.to_json(fig)
     return jsonify(graphJSON)
 

@@ -2,32 +2,49 @@
 <html lang="en"> 
     <head> 
         <meta charset="UTF-8"> 
-        <!-- Load Plotly.js -->         
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>         
-        <style>body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start;  /* Changed from center to flex-start */ height: 100vh; margin: 0; padding-top: 150px;  /* Increased top padding to move content down */ } #plot1, #plot2 { width: 80%; margin-bottom: 20px; } .slider-container { width: 80%; text-align: center; margin-bottom: 20px; } .slider { width: 100%; }</style>         
+        <head>Range from Launch Point</head>
+        <link rel="stylesheet" href="static/css/styles.css"> 
+        <!-- Load Plotly.js -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            /* Inline styles for plot1 and plot2 */
+            #plot1, #plot2 {
+                width: 700px;
+                height: 500px;
+                border-radius: 15px; /* Curved corners */
+                margin: auto; /* Center horizontally */
+                display: block; /* Ensures the div is block-level */
+            }
+        </style>
     </head>     
     <body>
-        <header>Range from launch point</header>
-        <header>Challenge #7: A curious fact is that the range of a projectile from the launch point (let&rsquo;s set this to be (0,0) for convenience) plotted against time can actually pass through a local maximum and then a minimum, before increasing with increasing gradient. Use the derivations on the next slide to recreate the above graphs. Work out the times, x, y, and r values for these maxima and minima and plot these via a marker such as a *.</header>
-        <header data-empty-placeholder=""></header>         
+        <header>
+            Challenge #7: A curious fact is that the range of a projectile from the launch point (let&rsquo;s set this to be (0,0) for convenience) plotted against time can actually pass through a local maximum and then a minimum, before increasing with increasing gradient. Use the derivations on the next slide to recreate the above graphs. Work out the times, x, y, and r values for these maxima and minima and plot these via a marker such as a *.
+        </header>
         <div class="slider-container">
-            <input class="slider" id="angle-slider-blue" type="range" min="0" max="90" step="1" value="60" oninput="updatePlot()"> <span id="angle-value-blue">Angle (Blue): 60 degrees</span> 
+            <input class="slider" id="angle-slider-blue" type="range" min="0" max="90" step="1" value="60" oninput="updatePlot()"> 
+            <span id="angle-value-blue">Angle (Blue): 60 degrees</span> 
         </div>         
         <div class="slider-container"> 
             <!-- Slider for green trajectory -->             
-            <input class="slider" id="angle-slider-green" type="range" min="0" max="90" step="1" value="70" oninput="updatePlot()"> <span id="angle-value-green">Angle (Green): 70 degrees</span> 
+            <input class="slider" id="angle-slider-green" type="range" min="0" max="90" step="1" value="70" oninput="updatePlot()"> 
+            <span id="angle-value-green">Angle (Green): 70 degrees</span> 
         </div>         
         <div class="slider-container"> 
             <!-- Slider for red trajectory -->             
-            <input class="slider" id="angle-slider-red" type="range" min="0" max="90" step="1" value="85" oninput="updatePlot()"> <span id="angle-value-red">Angle (Red): 85 degrees</span> 
+            <input class="slider" id="angle-slider-red" type="range" min="0" max="90" step="1" value="85" oninput="updatePlot()"> 
+            <span id="angle-value-red">Angle (Red): 85 degrees</span> 
         </div>         
         <div class="slider-container"> 
             <!-- Slider for yellow trajectory -->             
-            <input class="slider" id="angle-slider-yellow" type="range" min="0" max="90" step="1" value="45" oninput="updatePlot()"> <span id="angle-value-yellow">Angle (Yellow): 45 degrees</span> 
+            <input class="slider" id="angle-slider-yellow" type="range" min="0" max="90" step="1" value="45" oninput="updatePlot()"> 
+            <span id="angle-value-yellow">Angle (Yellow): 45 degrees</span> 
         </div>         
         <div class="slider-container"> 
             <!-- Slider for speed -->             
-            <input class="slider" id="speed-slider" type="range" min="1" max="20" step="1" value="10" oninput="updatePlot()"> <span id="speed-value">Speed: 10 m/s</span> 
+            <input class="slider" id="speed-slider" type="range" min="1" max="20" step="1" value="10" oninput="updatePlot()"> 
+            <span id="speed-value">Speed: 10 m/s</span> 
         </div>         
         <!-- Plotly graph for range vs time -->         
         <div id="plot1"></div>         
@@ -84,6 +101,5 @@
             });
         }
     </script>         
-        <main data-empty-placeholder=""></main>
     </body>     
 </html>

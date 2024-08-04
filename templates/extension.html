@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Launched From A Spherical Planet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="title">Projectile Launched From A Spherical Planet</div>
+    <div class="subtitle">Simulation to find out latitude and longitude where the projectile lands, and its motion's animation.</div>
+    <div class="iframe-container">
+        <iframe id="glowIframe" src="extensionGlowscript.html" frameborder="0" scrolling="no"></iframe>
+    </div>
+    <div class="note">(Hold right mouse button to rotate camera angle)</div>
+
+    <div class="input-container">
+        <input type="number" id="speedInput" placeholder="Enter speed" value="6000">
+        <button onclick="updateIframe()">Submit</button>
+    </div>
+
+    <div class="slider-container">
+        <!-- Your slider code here -->
+    </div>
+
+    <script>
+        function updateIframe() {
+            var speed = document.getElementById('speedInput').value;
+            var iframe = document.getElementById('glowIframe');
+            iframe.src = 'extensionGlowscript.html?speed=' + encodeURIComponent(speed);
+        }
+    </script>
+</body>
+</html>

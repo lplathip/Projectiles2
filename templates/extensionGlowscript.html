@@ -1,0 +1,137 @@
+<div id="glowscript" class="glowscript">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link type="text/css" href="https://www.glowscript.org/css/redmond/2.1/jquery-ui.custom.css" rel="stylesheet" />
+    <link type="text/css" href="https://www.glowscript.org/css/ide.css" rel="stylesheet" />
+    <script type="text/javascript" src="https://www.glowscript.org/lib/jquery/2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.glowscript.org/lib/jquery/2.1/jquery-ui.custom.min.js"></script>
+    <script type="text/javascript" src="https://www.glowscript.org/package/glow.3.2.min.js"></script>
+    <script type="text/javascript" src="https://www.glowscript.org/package/RSrun.3.2.min.js"></script>
+    <script type="text/javascript"><!--//--><![CDATA[//><!--
+    
+    // START JAVASCRIPT
+    ;(function() {;
+    var ρσ_modules = {};
+    ρσ_modules.pythonize = {};
+    
+    (function(){
+        function strings() {
+            var string_funcs, exclude, name;
+            string_funcs = set("capitalize strip lstrip rstrip islower isupper isspace lower upper swapcase center count endswith startswith find rfind index rindex format join ljust rjust partition rpartition replace split rsplit splitlines zfill".split(" "));
+            if (!arguments.length) {
+                exclude = (function(){
+                    var s = ρσ_set();
+                    s.jsset.add("split");
+                    s.jsset.add("replace");
+                    return s;
+                })();
+            } else if (arguments[0]) {
+                exclude = Array.prototype.slice.call(arguments);
+            } else {
+                exclude = null;
+            }
+            if (exclude) {
+                string_funcs = string_funcs.difference(set(exclude));
+            }
+            var ρσ_Iter0 = string_funcs;
+            ρσ_Iter0 = ((typeof ρσ_Iter0[Symbol.iterator] === "function") ? (ρσ_Iter0 instanceof Map ? ρσ_Iter0.keys() : ρσ_Iter0) : Object.keys(ρσ_Iter0));
+            for (var ρσ_Index0 of ρσ_Iter0) {
+                name = ρσ_Index0;
+                (ρσ_expr_temp = String.prototype)[(typeof name === "number" && name < 0) ? ρσ_expr_temp.length + name : name] = (ρσ_expr_temp = ρσ_str.prototype)[(typeof name === "number" && name < 0) ? ρσ_expr_temp.length + name : name];
+            }
+        };
+        if (!strings.__module__) Object.defineProperties(strings, {
+            __module__ : {value: "pythonize"}
+        });
+    
+        ρσ_modules.pythonize.strings = strings;
+    })();
+    
+    async function __main__() {
+    "use strict";
+        var display = canvas;
+        var scene = canvas();
+    
+        function round(num, n=0) {return Number(num.toFixed(n))}
+        var arrow, box, compound, cone, cylinder, ellipsoid, extrusion, helix, points, pyramid, ring, simple_sphere, group, vec, sleep, update, paths, shapes, vertex, triangle, quad, label, distant_light, local_light, attach_trail, attach_arrow, attach_light, sqrt, pi, sin, cos, tan, asin, acos, atan, atan2, exp, log, pow, factorial, combin, button, radio, checkbox, slider, checkbox, text, download, radians, degrees, get_library, read_local_file
+        var version, print, arange, __name__, type, ρσ_ls, G, M, earth_radius, earth, projectile_radius, projectile, speed, direction, velocity, dt, tracer, r, r_mag, g, gravitational_acceleration;
+        version = ρσ_list_decorate([ "3.2", "glowscript" ]);
+        Array.prototype['+'] = function(r) {return this.concat(r)}
+        Array.prototype['*'] = function(r) {return __array_times_number(this, r)}
+        window.__GSlang = "vpython";
+        print = GSprint;
+        arange = range;
+        __name__ = "__main__";
+        type = pytype;
+        var strings = ρσ_modules.pythonize.strings;
+    
+        strings();
+        "6";
+        scene.width = 800;
+        "7";
+        scene.height = 600;
+        "8";
+        scene.background = color.black;
+        "9";
+        scene.center = vector(0, 0, 0);
+        "10";
+        scene.range = 2["*"](6371e3);
+        "13";
+        G = 6.6743e-11;
+        "14";
+        M = 5.972e24;
+        "15";
+        earth_radius = 6371e3;
+        "18";
+        earth = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), radius: earth_radius, texture: textures.earth})]);
+        "21";
+        projectile_radius = earth_radius["/"](100); ;
+        "22";
+        projectile = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(earth_radius["+"](projectile_radius), 0, 0), radius: projectile_radius, color: color.red})]);
+        "25";
+        speed = 6e3;  // Initial default speed
+    
+        // Check for dynamic speed update from URL parameter
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('speed')) {
+            speed = parseFloat(urlParams.get('speed'));
+        }
+    
+        "26";
+        direction = vector(1, 1, 1).norm();
+        "27";
+        velocity = direction["*"](speed);
+        "30";
+        dt = 1;
+        "33";
+        tracer = ρσ_interpolate_kwargs.call(this, curve, [ρσ_desugar_kwargs({color: color.yellow})]);
+        "36";
+        while (true) {
+            "37";
+            (await rate(100));
+            "40";
+            r = projectile.pos["-"](1["*"](earth.pos));
+            "41";
+            r_mag = mag(r);
+            "44";
+            g = G["*"](M)["/"](Math.pow(r_mag, 2));
+            "45";
+            gravitational_acceleration = 1["-u"]()["*"](g)["*"](r.norm());
+            "48";
+            velocity=velocity["+"](gravitational_acceleration["*"](dt));
+            "51";
+            projectile.pos=projectile.pos["+"](velocity["*"](dt));
+            "54";
+            ρσ_interpolate_kwargs.call(tracer, tracer.append, [ρσ_desugar_kwargs({pos: projectile.pos})]);
+        }
+    };
+    if (!__main__.__module__) Object.defineProperties(__main__, {
+        __module__ : {value: null}
+    });
+    
+    ;$(function(){ window.__context = { glowscript_container: $("#glowscript").removeAttr("id") }; __main__() })})()
+    // END JAVASCRIPT
+    
+    //--><!]]></script>
+    </div>
+    

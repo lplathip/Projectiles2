@@ -1,0 +1,136 @@
+from vpython import sphere, vector, color, textures, scene, rate, curve, mag
+from math import radians, sin, cos  # Import the necessary functions
+
+# Constants
+G = 6.67430e-11  # Gravitational constant in m^3 kg^-1 s^-2
+earth_radius = 6.371e6  # Radius of Earth in meters
+mars_radius = 3.389e6  # Radius of Mars in meters
+moon_radius = 1.737e6  # Radius of Moon in meters
+
+# Mass and angular velocity
+masses = {
+    'Earth': 5.972e24,  # Mass of Earth in kg
+    'Mars': 6.417e23,   # Mass of Mars in kg
+    'Moon': 7.347e22    # Mass of Moon in kg
+}
+
+angular_velocities = {
+    'Earth': 7.2921e-5,  # Angular velocity of Earth's rotation in rad/s
+    'Mars': 7.088e-5,    # Angular velocity of Mars's rotation in rad/s
+    'Moon': 2.6617e-6    # Angular velocity of Moon's rotation in rad/s
+}
+
+# Texture links
+marsTextureLink = "https://t4.ftcdn.net/jpg/03/38/48/79/360_F_338487951_noDUtHlzxljulqg525A9YZAup9IEpeNS.jpg"
+moonTextureLink = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/2a64be81-f424-4865-a4ba-9bc237bcc6a5/dgxt0mn-8521344f-ace3-4ba9-a6e5-d475cb0d198d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzJhNjRiZTgxLWY0MjQtNDg2NS1hNGJhLTliYzIzN2JjYzZhNVwvZGd4dDBtbi04NTIxMzQ0Zi1hY2UzLTRiYTktYTZlNS1kNDc1Y2IwZDE5OGQucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.5eVounbcJ0_wxdVj3cmYuOovcoGVZPax5xT1c50xmZM"
+
+# Mode selection
+mode = "Earth"  # Default mode
+
+# Set the radius, mass, angular velocity, and texture based on the mode
+if mode == "Earth":
+    radius = earth_radius
+    mass = masses['Earth']
+    omega = angular_velocities['Earth']
+    texture = textures.earth
+elif mode == "Mars":
+    radius = mars_radius
+    mass = masses['Mars']
+    omega = angular_velocities['Mars']
+    texture = marsTextureLink
+elif mode == "Moon":
+    radius = moon_radius
+    mass = masses['Moon']
+    omega = angular_velocities['Moon']
+    texture = moonTextureLink
+else:
+    raise ValueError("Unknown mode. Please select 'Earth', 'Mars', or 'Moon'.")
+
+# Convert latitude and longitude to Cartesian coordinates
+def lat_lon_to_cartesian(lat, lon, R):
+    # Convert latitude and longitude from degrees to radians
+    lat_rad = radians(lat)
+    lon_rad = radians(lon)
+    
+    # Calculate Cartesian coordinates
+    x = R * cos(lon_rad) * cos(lat_rad)
+    y = R * cos(lon_rad) * sin(lat_rad)
+    z = R * sin(lon_rad)
+    
+    return x, y, z
+
+
+# Example latitude and longitude
+latitude = 40  # degrees
+longitude = 0  # degrees
+
+longitude *= -1
+
+
+longitude += 90
+
+
+'''
+latitude = 15.9
+longitude = 101.0
+
+latitude -= 90
+longitude += 0
+'''
+
+
+# Convert to Cartesian coordinates
+initial_x, initial_y, initial_z = lat_lon_to_cartesian(latitude, longitude, radius)
+print(initial_x, initial_y, initial_z)
+
+# Create the planet with the selected texture
+planet = sphere(pos=vector(0, 0, 0), radius=radius, texture=texture)
+
+# Create a projectile
+projectile_radius = radius / 100
+projectile = sphere(pos=vector(initial_x, initial_y, initial_z), radius=projectile_radius, color=color.red)
+
+# Initial velocity of the projectile
+speed = 6000  # m/s
+direction = vector(1, 1, 1).norm()  # Normalize the direction vector
+velocity = direction * speed  # Velocity vector
+
+# Time step for the simulation
+dt = 1  # seconds
+
+# Create a curve object for the tracer
+tracer = curve(color=color.yellow)
+
+# Tilt angle in degrees and convert to radians
+tilt_angle = radians(23.5)
+rotation_axis = vector(sin(tilt_angle), cos(tilt_angle), 0)
+
+# Keep the window open and update the projectile's position
+while True:
+    rate(100)  # Limit the loop to 100 iterations per second
+    
+    # Rotate the planet around the tilted axis
+    planet.rotate(angle=omega * dt, axis=rotation_axis)
+    
+    # Calculate the distance from the center of the planet to the projectile
+    r = projectile.pos - planet.pos  # Displacement vector from the center of the planet to the projectile
+    r_mag = mag(r)  # Magnitude of the displacement vector
+    
+    # Calculate the gravitational acceleration
+    g = G * mass / r_mag**2
+    gravitational_acceleration = -g * r.norm()  # Gravitational acceleration vector (directed towards the center of the planet)
+    
+    # Calculate the centrifugal acceleration
+    centrifugal_acceleration = omega**2 * r_mag * r.norm()  # Centrifugal acceleration vector (outward from the axis of rotation)
+    
+    # Net acceleration considering both gravity and centrifugal force
+    net_acceleration = gravitational_acceleration + centrifugal_acceleration
+    
+    # Update the projectile's velocity
+    velocity += net_acceleration * dt
+    
+    # Update the projectile's position
+    projectile.pos += velocity * dt
+    
+    # Add the new position to the tracer
+    tracer.append(pos=projectile.pos)
