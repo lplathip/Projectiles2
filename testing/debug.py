@@ -1,30 +1,56 @@
-import plotly.graph_objs as go
-import plotly.io as pio
+from vpython import *
+import math
 
-# Sample data
-x = [1, 2, 3, 4, 5]
-y = [10, 11, 12, 13, 14]
+# Set up the scene
+scene = canvas(title='Projectile on Earth', width=800, height=600, center=vector(0,0,0), background=color.black)
 
-# Create a trace
-trace = go.Scatter(
-    x=x,
-    y=y,
-    mode='lines+markers',
-    name='Sample Data'
-)
+# Create Earth
+earth_radius = 6.371e6  # in meters
+earth = sphere(pos=vector(0,0,0), radius=earth_radius, texture=textures.earth)
 
-# Create layout with black background
-layout = go.Layout(
-    title='Sample Plot',
-    xaxis=dict(title='X-axis'),
-    yaxis=dict(title='Y-axis'),
-    paper_bgcolor='black',
-    plot_bgcolor='black',
-    font=dict(color='white')  # Change font color to white for better visibility
-)
+# Function to convert latitude and longitude to XYZ coordinates
+def latlon_to_xyz(lat, lon, radius):
+    lat_rad = math.radians(lat)
+    lon_rad = math.radians(lon)
+    x = radius * math.cos(lat_rad) * math.cos(lon_rad)
+    y = radius * math.cos(lat_rad) * math.sin(lon_rad)
+    z = radius * math.sin(lat_rad)
+    return vector(x, y, z)
 
-# Create figure with the trace and layout
-fig = go.Figure(data=[trace], layout=layout)
+# Function to convert azimuth and elevation to velocity vector
+def azimuth_elevation_to_velocity(azimuth, elevation, speed):
+    azimuth_rad = math.radians(azimuth)
+    elevation_rad = math.radians(elevation)
+    vx = speed * math.cos(elevation_rad) * math.cos(azimuth_rad)
+    vy = speed * math.cos(elevation_rad) * math.sin(azimuth_rad)
+    vz = speed * math.sin(elevation_rad)
+    return vector(vx, vy, vz)
 
-# Display the figure
-pio.show(fig)
+# Specific inputs
+latitude = 15  # degrees
+longitude = 1  # degrees
+azimuth = 30  # degrees from north
+elevation = 30  # degrees from horizontal
+speed = 3000  # m/s
+
+# Convert latitude and longitude to initial position
+proj_initial_pos = latlon_to_xyz(latitude, longitude, earth_radius + 10)  # 10 meters above the surface
+
+# Convert azimuth and elevation to initial velocity
+proj_velocity = azimuth_elevation_to_velocity(azimuth, elevation, speed)
+
+# Create the projectile
+proj_radius = earth_radius / 100  # 1/100th of the Earth's radius
+projectile = sphere(pos=proj_initial_pos, radius=proj_radius, color=color.red, make_trail=True)
+
+# Gravity
+g = 9.81
+
+# Time step
+dt = 0.01
+
+# Simulation loop
+while projectile.pos.mag < earth_radius + 5000:  # stop when the projectile is far from the Earth
+    rate(100)
+    proj_velocity.z -= g * dt  # Update velocity due to gravity
+    projectile.pos += proj_velocity * dt  # Update position

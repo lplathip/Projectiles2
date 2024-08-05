@@ -14,6 +14,14 @@ body {
     text-align: center;
 }
 
+.text-container {
+    max-width: 700px; /* Same max width as the plot boxes */
+    width: 100%; /* Ensure it fits the parent container's width */
+    margin: 0 auto; /* Center the text container */
+    text-align: center; /* Center-align the text */
+    overflow-wrap: break-word; /* Break words if necessary to prevent overflow */
+}
+
 .slider-container {
     margin: 20px 0;
 }
@@ -23,9 +31,10 @@ body {
     width: 150px;
 }
 
-#graph {
-    width: 700px;
-    height: 500px;
+#graph, #plot1, #plot2, #plot {
+    width: 100%; /* Set width to 100% for responsiveness */
+    max-width: 700px; /* Set a max width */
+    height: 400px; /* Adjust height for smaller screens */
     border-radius: 15px;
     margin: 20px 0;
     display: block;
@@ -43,4 +52,27 @@ h1 {
     margin-top: 20px;
     font-size: 18px;
     font-weight: 400;
+}
+
+/* Media query for screens smaller than 600px */
+@media only screen and (max-width: 600px) {
+    body {
+        padding: 10px; /* Reduce padding on smaller screens */
+    }
+
+    h1 {
+        font-size: 20px; /* Adjust font size for headings */
+    }
+
+    .slider-label {
+        width: 100px; /* Adjust slider label width */
+    }
+
+    #graph {
+        height: 300px; /* Adjust height for smaller screens */
+    }
+
+    #timeOfFlight, #maxTimeOfFlight, #arcLength, #maxArcLength {
+        font-size: 16px; /* Adjust font size for text */
+    }
 }

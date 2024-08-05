@@ -192,10 +192,9 @@ def plot_projectile_trajectories_3(X=1000, Y=300, h=0, g=9.81, u=150):
     x_max, y_max = get_trajectory_data_3(max_horizontal_angle_deg, u, h, g)
     fig.add_trace(go.Scatter(x=x_max, y=y_max, mode='lines', name=f'Maximum Horizontal Path ({max_horizontal_angle_deg:.1f}°)'))
 
-    fig.add_trace(go.Scatter(x=[X], y=[Y], mode='markers', marker=dict(color='purple', size=10), name=f'Target Point ({X}, {Y})'))
+    fig.add_trace(go.Scatter(x=[X], y=[Y], mode='markers', marker=dict(color='white', size=10), name=f'Target Point ({X}, {Y})'))
 
     fig.update_layout(
-        title='High/Low Ball & Minimum Speed to Target Point',
         xaxis_title='Horizontal Distance (m)',
         yaxis_title='Vertical Distance (m)',
                       paper_bgcolor='#26252C', 

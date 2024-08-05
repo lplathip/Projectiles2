@@ -10,13 +10,33 @@ omega = 7.2921e-5  # Angular velocity of Earth's rotation in rad/s
 # Create Earth with texture
 earth = sphere(pos=vector(0, 0, 0), radius=earth_radius, texture=textures.earth)
 
+# Convert latitude and longitude to Cartesian coordinates
+latitude = 16  # in degrees
+longitude = 100  # in degrees
+
+# Convert degrees to radians
+phi = radians(latitude)
+lambda_ = radians(longitude)
+
+# Calculate Cartesian coordinates
+z = earth_radius * cos(phi) * cos(lambda_)
+x = earth_radius * cos(phi) * sin(lambda_)
+y = earth_radius * sin(phi)
+
 # Create a projectile
 projectile_radius = earth_radius / 100
-projectile = sphere(pos=vector(earth_radius + projectile_radius, 0, 0), radius=projectile_radius, color=color.red)
+projectile = sphere(pos=vector(x, y , z), radius=projectile_radius, color=color.red)
+
+ballX = sphere(pos=vector(earth_radius, 0 , 0), radius=projectile_radius, color=color.blue)
+ballY = sphere(pos=vector(0, earth_radius , 0), radius=projectile_radius, color=color.green)
+ballZ = sphere(pos=vector(0, 0 , earth_radius), radius=projectile_radius, color=color.yellow)
+
+
+vx, vy, vz = 0.5953,0.3304,0.7314
 
 # Initial velocity of the projectile
 speed = 6000  # m/s
-direction = vector(1, 1, 1).norm()  # Normalize the direction vector
+direction = vector(vx, vy, vz).norm()  # Normalize the direction vector
 velocity = direction * speed  # Velocity vector
 
 # Time step for the simulation
