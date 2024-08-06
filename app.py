@@ -477,6 +477,113 @@ def update_7():
     # Return updated plots JSON
     return jsonify({'plot1': fig1.to_json(), 'plot2': fig2.to_json()})
 
+#Task 8
+
+@app.route('/task8')
+def index_8():
+    return render_template('task8.html')
+
+@app.route('/update_animated_8', methods=['POST'])
+
+def update_animated_8():
+    # Get parameters from the request
+    data = request.json
+    bounces = int(data.get('bounces', 5))
+    e = float(data.get('e', 0.8))
+    initial_speed = float(data.get('initial_speed', 20))
+    launch_angle = float(data.get('launch_angle', 45))
+
+    # Parameters
+    g = 9.81  # Acceleration due to gravity (m/s^2)
+    dt = 0.01  # Time step (s)
+
+    # Initial conditions
+    v0_x = initial_speed * np.cos(np.radians(launch_angle))
+    v0_y = initial_speed * np.sin(np.radians(launch_angle))
+    x0, y0 = 0, 0
+
+    # Arrays to store the trajectory
+    x = [x0]
+    y = [y0]
+
+    # Verlet integration with bounces
+    vx, vy = v0_x, v0_y
+    bounce_count = 0
+
+    while bounce_count < bounces:
+        while y[-1] >= 0:
+            x_new = x[-1] + vx * dt
+            y_new = y[-1] + vy * dt - 0.5 * g * dt**2
+            vy -= g * dt
+            
+            x.append(x_new)
+            y.append(y_new)
+
+        # Check for bounce
+        if y[-1] < 0:
+            y[-1] = 0  # Reset the y position to ground level
+            vy = -e * vy  # Apply the coefficient of restitution
+            bounce_count += 1
+
+    # Convert lists to numpy arrays for plotting
+    x = np.array(x)
+    y = np.array(y)
+
+    # Define range for the plot
+    xm = np.min(x) - 1.5
+    xM = np.max(x) + 1.5
+    ym = np.min(y) - 1.5
+    yM = np.max(y) + 1.5
+
+    # Number of frames for animation
+    N_frames = len(x)
+
+    # Create frames for the animation
+    frames = [
+        go.Frame(
+            data=[
+                go.Scatter(x=x[:k], y=y[:k],
+                           mode="lines",
+                           line=dict(width=2, color="blue")),
+                go.Scatter(x=[x[k]], y=[y[k]],
+                           mode="markers",
+                           marker=dict(color="red", size=10))
+            ],
+            name=f'Frame {k}'
+        ) for k in range(N_frames)
+    ]
+
+    # Create the figure object with specified dimensions
+    fig = go.Figure(
+        data=[
+            go.Scatter(x=x, y=y,
+                    mode="lines",
+                    line=dict(width=2, color="blue")),
+            go.Scatter(x=[x[0]], y=[y[0]],
+                    mode="markers",
+                    marker=dict(color="red", size=10))
+        ],
+        layout=go.Layout(
+            title='',
+            xaxis_title='x (m)',
+            yaxis_title='y (m)',
+            paper_bgcolor='#26252C',
+            plot_bgcolor='#26252C',
+            font=dict(color='white'),
+            xaxis=dict(range=[xm, xM], autorange=False, zeroline=False),
+            yaxis=dict(range=[ym, yM], autorange=False, zeroline=False),
+            hovermode="closest",
+            width=700,  # Set the width of the plot
+            height=400,  # Set the height of the plot
+        ),
+        frames=frames
+    )
+
+    # Convert the figure to JSON and return it
+    graphJSON = fig.to_json()
+    return jsonify(graphJSON)
+
+
 
 
 #Task 9
@@ -584,10 +691,11 @@ def update_9():
     return jsonify(graphJSON)
 
 #Task 8 
+'''
 @app.route('/COR')
 def index_8():
     return render_template('COR.html')
-
+'''
 
 if __name__ == '__main__':
     app.run(port=5000, host='0.0.0.0')
