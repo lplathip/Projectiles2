@@ -572,9 +572,8 @@ def update_animated_8():
             font=dict(color='white'),
             xaxis=dict(range=[xm, xM], autorange=False, zeroline=False),
             yaxis=dict(range=[ym, yM], autorange=False, zeroline=False),
+            showlegend=False,
             hovermode="closest",
-            width=700,  # Set the width of the plot
-            height=400,  # Set the height of the plot
         ),
         frames=frames
     )
