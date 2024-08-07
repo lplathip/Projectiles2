@@ -98,5 +98,9 @@ def update_8():
     graphJSON = pio.to_json(fig)
     return jsonify(graphJSON)
 
+@app.route('/extension')
+def index_10():
+    return render_template('extension.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

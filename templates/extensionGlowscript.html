@@ -1,5 +1,4 @@
 <div id="glowscript" class="glowscript">
-
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link type="text/css" href="https://www.glowscript.org/css/redmond/2.1/jquery-ui.custom.css" rel="stylesheet" />
     <link type="text/css" href="https://www.glowscript.org/css/ide.css" rel="stylesheet" />
@@ -46,15 +45,27 @@
     
         ρσ_modules.pythonize.strings = strings;
     })();
+
+    // Function to get query parameters from the URL
+    function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            speed: parseFloat(params.get('speed')) || 5500,
+            latitude: parseFloat(params.get('latitude')) || 52.36,
+            longitude: parseFloat(params.get('longitude')) || 1.17,
+            vx: parseFloat(params.get('vx')) || .5953,
+            vy: parseFloat(params.get('vy')) || .3304,
+            vz: parseFloat(params.get('vz')) || .6014
+        };
+    }
     
     async function __main__() {
     "use strict";
+        var params = getQueryParams(); // Get the query parameters
         var display = canvas;
         var scene = canvas();
-    
-        function round(num, n=0) {return Number(num.toFixed(n))}
-        var arrow, box, compound, cone, cylinder, ellipsoid, extrusion, helix, points, pyramid, ring, simple_sphere, group, vec, sleep, update, paths, shapes, vertex, triangle, quad, label, distant_light, local_light, attach_trail, attach_arrow, attach_light, sqrt, pi, sin, cos, tan, asin, acos, atan, atan2, exp, log, pow, factorial, combin, button, radio, checkbox, slider, checkbox, text, download, radians, degrees, get_library, read_local_file
-        var version, print, arange, __name__, type, ρσ_ls, G, M, earth_radius, earth, projectile_radius, projectile, speed, direction, velocity, dt, tracer, r, r_mag, g, gravitational_acceleration;
+        var box, compound, cone, cylinder, ellipsoid, extrusion, helix, points, pyramid, ring, simple_sphere, group, vec, sleep, update, paths, shapes, vertex, triangle, quad, distant_light, local_light, attach_trail, attach_arrow, attach_light, sqrt, pi, tan, asin, acos, atan, atan2, exp, log, pow, factorial, combin, button, radio, checkbox, slider, checkbox, text, download, degrees, get_library, read_local_file
+        var version, print, arange, __name__, type, ρσ_ls, G, M, earth_radius, omega, earth, latitude, longitude, phi, lambda_, z, x, y, projectile_radius, projectile, axis_length, shaftwidth, x_axis, y_axis, z_axis, ρσ_unpack, vx, vy, vz, speed, direction, velocity, dt, tracer, tilt_angle, rotation_axis, counter, r, r_mag, g, gravitational_acceleration, centrifugal_acceleration, net_acceleration;
         version = ρσ_list_decorate([ "3.2", "glowscript" ]);
         Array.prototype['+'] = function(r) {return this.concat(r)}
         Array.prototype['*'] = function(r) {return __array_times_number(this, r)}
@@ -66,63 +77,104 @@
         var strings = ρσ_modules.pythonize.strings;
     
         strings();
-        "6";
-        scene.width = 800;
-        "7";
-        scene.height = 600;
-        "8";
-        scene.background = color.black;
-        "9";
-        scene.center = vector(0, 0, 0);
-        "10";
-        scene.range = 2["*"](6371e3);
-        "13";
+        scene = ρσ_interpolate_kwargs.call(this, canvas, [ρσ_desugar_kwargs({width: 700, height: 400})]);
+        "4";
         G = 6.6743e-11;
-        "14";
+        "5";
         M = 5.972e24;
-        "15";
+        "6";
         earth_radius = 6371e3;
-        "18";
+        "7";
+        omega = 72921e-9;
+        "10";
         earth = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), radius: earth_radius, texture: textures.earth})]);
+        "13";
+        latitude = params.latitude;
+        "14";
+        longitude = params.longitude;
+        "17";
+        phi = (await radians(latitude));
+        "18";
+        lambda_ = (await radians(longitude));
         "21";
-        projectile_radius = earth_radius["/"](100); ;
+        z = earth_radius["*"](cos(phi))["*"](cos(lambda_));
         "22";
-        projectile = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(earth_radius["+"](projectile_radius), 0, 0), radius: projectile_radius, color: color.red})]);
-        "25";
-        speed = 6e3;  // Initial default speed
-    
-        // Check for dynamic speed update from URL parameter
-        var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('speed')) {
-            speed = parseFloat(urlParams.get('speed'));
-        }
-    
+        x = earth_radius["*"](cos(phi))["*"](sin(lambda_));
+        "23";
+        y = earth_radius["*"](sin(phi));
         "26";
-        direction = vector(1, 1, 1).norm();
+        projectile_radius = earth_radius["/"](100);
         "27";
-        velocity = direction["*"](speed);
+        projectile = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(x, y, z), radius: projectile_radius, color: color.red})]);
         "30";
-        dt = 1;
+        axis_length = earth_radius["*"](1.5);
+        "31";
+        shaftwidth = earth_radius["*"](.01);
+        "32";
+        x_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(axis_length, 0, 0), color: color.blue, shaftwidth: shaftwidth})]);
         "33";
-        tracer = ρσ_interpolate_kwargs.call(this, curve, [ρσ_desugar_kwargs({color: color.yellow})]);
+        y_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(0, axis_length, 0), color: color.green, shaftwidth: shaftwidth})]);
+        "34";
+        z_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(0, 0, axis_length), color: color.yellow, shaftwidth: shaftwidth})]);
         "36";
+        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: x_axis.pos["+"](x_axis.axis), text: "x", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        "37";
+        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: y_axis.pos["+"](y_axis.axis), text: "y", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        "38";
+        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: z_axis.pos["+"](z_axis.axis), text: "z", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        "40";
+        vx = params.vx;
+        vy = params.vy;
+        vz = params.vz;
+        "43";
+        speed = params.speed;
+        "44";
+        direction = vector(vx, vy, vz).norm();
+        "45";
+        velocity = direction["*"](speed);
+        "48";
+        dt = .5;
+        "51";
+        tracer = ρσ_interpolate_kwargs.call(this, curve, [ρσ_desugar_kwargs({color: color.yellow})]);
+        "54";
+        tilt_angle = (await radians(23.5));
+        "55";
+        rotation_axis = vector(sin(tilt_angle), cos(tilt_angle), 0);
+        "58";
+        counter = 0;
+        "59";
         while (true) {
-            "37";
-            (await rate(100));
-            "40";
+            "60";
+            (await rate(1e3));
+            "63";
+            ρσ_interpolate_kwargs.call(earth, earth.rotate, [ρσ_desugar_kwargs({angle: omega["*"](dt), axis: rotation_axis})]);
+            "66";
             r = projectile.pos["-"](1["*"](earth.pos));
-            "41";
+            "67";
             r_mag = mag(r);
-            "44";
+            "70";
             g = G["*"](M)["/"](Math.pow(r_mag, 2));
-            "45";
+            "71";
             gravitational_acceleration = 1["-u"]()["*"](g)["*"](r.norm());
-            "48";
-            velocity=velocity["+"](gravitational_acceleration["*"](dt));
-            "51";
+            "74";
+            centrifugal_acceleration = Math.pow(omega, 2)["*"](r_mag)["*"](r.norm());
+            "77";
+            net_acceleration = gravitational_acceleration["+"](centrifugal_acceleration);
+            "80";
+            velocity=velocity["+"](net_acceleration["*"](dt));
+            "83";
             projectile.pos=projectile.pos["+"](velocity["*"](dt));
-            "54";
+            "86";
             ρσ_interpolate_kwargs.call(tracer, tracer.append, [ρσ_desugar_kwargs({pos: projectile.pos})]);
+            "88";
+            counter=counter["+"](1);
+            "90";
+            if (counter[">"](2) && r_mag["<"](earth_radius)) {
+                "91";
+                velocity = vector(0, 0, 0);
+                "92";
+                omega = 0;
+            }
         }
     };
     if (!__main__.__module__) Object.defineProperties(__main__, {
@@ -134,4 +186,3 @@
     
     //--><!]]></script>
     </div>
-    

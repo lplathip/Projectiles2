@@ -1,6 +1,4 @@
-from vpython import sphere, vector, color, textures, scene, rate, curve, mag
-from math import radians, sin, cos  # Import the necessary functions
-
+from vpython import sphere, vector, color, textures, scene, rate, curve, mag, label, arrow, radians, sin, cos
 # Constants
 G = 6.67430e-11  # Gravitational constant in m^3 kg^-1 s^-2
 M = 5.972e24  # Mass of Earth in kg
@@ -11,8 +9,8 @@ omega = 7.2921e-5  # Angular velocity of Earth's rotation in rad/s
 earth = sphere(pos=vector(0, 0, 0), radius=earth_radius, texture=textures.earth)
 
 # Convert latitude and longitude to Cartesian coordinates
-latitude = 16  # in degrees
-longitude = 100  # in degrees
+latitude = 52.36  # in degrees
+longitude = 1.17  # in degrees
 
 # Convert degrees to radians
 phi = radians(latitude)
@@ -25,22 +23,28 @@ y = earth_radius * sin(phi)
 
 # Create a projectile
 projectile_radius = earth_radius / 100
-projectile = sphere(pos=vector(x, y , z), radius=projectile_radius, color=color.red)
+projectile = sphere(pos=vector(x, y, z), radius=projectile_radius, color=color.red)
 
-ballX = sphere(pos=vector(earth_radius, 0 , 0), radius=projectile_radius, color=color.blue)
-ballY = sphere(pos=vector(0, earth_radius , 0), radius=projectile_radius, color=color.green)
-ballZ = sphere(pos=vector(0, 0 , earth_radius), radius=projectile_radius, color=color.yellow)
+# Create labeled axes
+axis_length = earth_radius * 1.5
+shaftwidth = earth_radius * 0.01  # Thinner axis width
+x_axis = arrow(pos=vector(0, 0, 0), axis=vector(axis_length, 0, 0), color=color.blue, shaftwidth=shaftwidth)
+y_axis = arrow(pos=vector(0, 0, 0), axis=vector(0, axis_length, 0), color=color.green, shaftwidth=shaftwidth)
+z_axis = arrow(pos=vector(0, 0, 0), axis=vector(0, 0, axis_length), color=color.yellow, shaftwidth=shaftwidth)
 
+label(pos=x_axis.pos + x_axis.axis, text='x', xoffset=10, yoffset=10, space=30, height=20, border=4, font='sans')
+label(pos=y_axis.pos + y_axis.axis, text='y', xoffset=10, yoffset=10, space=30, height=20, border=4, font='sans')
+label(pos=z_axis.pos + z_axis.axis, text='z', xoffset=10, yoffset=10, space=30, height=20, border=4, font='sans')
 
-vx, vy, vz = 0.5953,0.3304,0.7314
+vx, vy, vz = 0.5953, 0.3304, 0.6014
 
 # Initial velocity of the projectile
-speed = 6000  # m/s
+speed = 5500  # m/s
 direction = vector(vx, vy, vz).norm()  # Normalize the direction vector
 velocity = direction * speed  # Velocity vector
 
 # Time step for the simulation
-dt = 1  # seconds
+dt = 0.1  # seconds
 
 # Create a curve object for the tracer
 tracer = curve(color=color.yellow)
@@ -50,8 +54,9 @@ tilt_angle = radians(23.5)
 rotation_axis = vector(sin(tilt_angle), cos(tilt_angle), 0)
 
 # Keep the window open and update the projectile's position
+counter = 0
 while True:
-    rate(100)  # Limit the loop to 100 iterations per second
+    rate(1000)  # Limit the loop to 100 iterations per second
     
     # Rotate the Earth around the tilted axis
     earth.rotate(angle=omega * dt, axis=rotation_axis)
@@ -78,3 +83,9 @@ while True:
     
     # Add the new position to the tracer
     tracer.append(pos=projectile.pos)
+    
+    counter += 1
+
+    if counter > 2 and r_mag < earth_radius:
+        velocity = vector(0, 0 ,0)
+

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
@@ -689,12 +689,15 @@ def update_9():
     graphJSON = pio.to_json(fig)
     return jsonify(graphJSON)
 
-#Task 8 
-'''
-@app.route('/COR')
-def index_8():
-    return render_template('COR.html')
-'''
+#Extension
+
+@app.route('/extension')
+def index_10():
+    return render_template('extension.html')
+
+@app.route('/extensionGlowscript.html')
+def extension_glowscript():
+    return send_from_directory('templates', 'extensionGlowscript.html')
 
 if __name__ == '__main__':
     app.run(port=5000, host='0.0.0.0')
