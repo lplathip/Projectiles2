@@ -14,6 +14,18 @@
         <div class="text-container">In this case define a equally spaced array of x coordinate values
             between 0 and the maximum horizontal range R.</div>
         <div class="text-container">Plot the trajectory and the apogee.</div>
+
+        
+        <div class="text-container">
+            Maximum Horizontal Range = (u<sup>2</sup> / g) (sinθ cosθ + cosθ * sqrt(sin<sup>2</sup>θ + 2gh / u<sup>2</sup>))
+
+        </div>
+        <div class="text-container">x (apogee) = (u<sup>2</sup> sinθ cosθ) / g<br> </div>
+        <div class="text-container">y (apogee) = h + (u<sup>2</sup> sin<sup>2</sup>θ) / (2g)<br> </div>
+        <div class="text-container">
+            y = h + x tanθ - g * (1 + tan<sup>2</sup>θ) x<sup>2</sup> / (2u<sup>2</sup>)
+        </div>
+        
         <div class="slider-container"> 
             <label class="slider-label" for="speed">Launch Speed (u):</label>             
             <input type="range" id="speed" name="speed" min="1" max="100" step="1" value="10"> <span id="speedValue">10</span> 
