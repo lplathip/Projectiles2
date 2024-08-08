@@ -74,11 +74,18 @@ h1 {
         width: 100px; /* Adjust slider label width */
     }
 
-    #graph {
+    #graph, #plot1, #plot2, #plot {
         height: 300px; /* Adjust height for smaller screens */
     }
 
     #timeOfFlight, #maxTimeOfFlight, #arcLength, #maxArcLength {
         font-size: 16px; /* Adjust font size for text */
+    }
+
+    .iframe-container {
+        background-color: transparent;
+        width: 400px;
+        height: 300px;
+        margin: 0 auto;
     }
 }
