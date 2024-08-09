@@ -1,6 +1,7 @@
 <div id="glowscript" class="glowscript">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link type="text/css" href="https://www.glowscript.org/css/redmond/2.1/jquery-ui.custom.css" rel="stylesheet" />
+
     <script type="text/javascript" src="https://www.glowscript.org/lib/jquery/2.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://www.glowscript.org/lib/jquery/2.1/jquery-ui.custom.min.js"></script>
     <script type="text/javascript" src="https://www.glowscript.org/package/glow.3.2.min.js"></script>
@@ -44,7 +45,7 @@
     
         ρσ_modules.pythonize.strings = strings;
     })();
-
+    
     // Function to get query parameters from the URL
     function getQueryParams() {
         const params = new URLSearchParams(window.location.search);
@@ -54,7 +55,8 @@
             longitude: parseFloat(params.get('longitude')) || 1.17,
             vx: parseFloat(params.get('vx')) || .5953,
             vy: parseFloat(params.get('vy')) || .3304,
-            vz: parseFloat(params.get('vz')) || .6014
+            vz: parseFloat(params.get('vz')) || .6014,
+            mode: params.get('mode') || 'earth'
         };
     }
     
@@ -64,7 +66,7 @@
         var display = canvas;
         var scene = canvas();
         var box, compound, cone, cylinder, ellipsoid, extrusion, helix, points, pyramid, ring, simple_sphere, group, vec, sleep, update, paths, shapes, vertex, triangle, quad, distant_light, local_light, attach_trail, attach_arrow, attach_light, sqrt, pi, tan, asin, acos, atan, atan2, exp, log, pow, factorial, combin, button, radio, checkbox, slider, checkbox, text, download, degrees, get_library, read_local_file
-        var version, print, arange, __name__, type, ρσ_ls, G, M, earth_radius, omega, earth, latitude, longitude, phi, lambda_, z, x, y, projectile_radius, projectile, axis_length, shaftwidth, x_axis, y_axis, z_axis, ρσ_unpack, vx, vy, vz, speed, direction, velocity, dt, tracer, tilt_angle, rotation_axis, counter, r, r_mag, g, gravitational_acceleration, centrifugal_acceleration, net_acceleration;
+        var version, print, arange, __name__, type, ρσ_ls, G, planet_data, mode, planet, M, planet_radius, omega, rotationAngle, planet_sphere, latitude, longitude, phi, lambda_, z, x, y, projectile_radius, projectile, axis_length, shaftwidth, x_axis, y_axis, z_axis, vx, vy, vz, speed, direction, velocity, dt, tracer, tilt_angle, rotation_axis, counter, r, r_mag, g, gravitational_acceleration, net_acceleration;
         version = ρσ_list_decorate([ "3.2", "glowscript" ]);
         Array.prototype['+'] = function(r) {return this.concat(r)}
         Array.prototype['*'] = function(r) {return __array_times_number(this, r)}
@@ -78,100 +80,138 @@
         strings();
         scene = ρσ_interpolate_kwargs.call(this, canvas, [ρσ_desugar_kwargs({width: 400, height: 300, background: color.black})]);
         "4";
-        G = 6.6743e-11;
-        "5";
-        M = 5.972e24;
+        G = 6.674["*"](Math.pow(10, 11["-u"]()));
         "6";
-        earth_radius = 6371e3;
-        "7";
-        omega = 72921e-9;
-        "10";
-        earth = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), radius: earth_radius, texture: textures.earth})]);
-        "13";
-        latitude = params.latitude;
-        "14";
-        longitude = params.longitude;
-        "17";
-        phi = (await radians(latitude));
-        "18";
-        lambda_ = (await radians(longitude));
-        "21";
-        z = earth_radius["*"](cos(phi))["*"](cos(lambda_));
-        "22";
-        x = earth_radius["*"](cos(phi))["*"](sin(lambda_));
-        "23";
-        y = earth_radius["*"](sin(phi));
-        "26";
-        projectile_radius = earth_radius["/"](100);
-        "27";
-        projectile = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(x, y, z), radius: projectile_radius, color: color.red})]);
-        "30";
-        axis_length = earth_radius["*"](1.5);
+        planet_data = (function(){
+            var ρσ_d = ρσ_dict();
+            ρσ_d.set("earth", (function(){
+                var ρσ_d = ρσ_dict();
+                ρσ_d.set("mass", 5.972["*"](Math.pow(10, 24)));
+                ρσ_d.set("radius", 6.371["*"](Math.pow(10, 6)));
+                ρσ_d.set("omega", 7.292["*"](Math.pow(10, 5["-u"]())));
+                ρσ_d.set("texture", textures.earth);
+                ρσ_d.set("rotationAngle", 2.344["*"](Math.pow(10, 1["-u"]())));
+                return ρσ_d;
+            }).call(this));
+            ρσ_d.set("mars", (function(){
+                var ρσ_d = ρσ_dict();
+                ρσ_d.set("mass", 6.39["*"](Math.pow(10, 23)));
+                ρσ_d.set("radius", 3.3895["*"](Math.pow(10, 6)));
+                ρσ_d.set("omega", 7.088["*"](Math.pow(10, 5["-u"]())));
+                ρσ_d.set("texture", "https://upload.wikimedia.org/wikipedia/commons/7/70/Solarsystemscope_texture_8k_mars.jpg");
+                ρσ_d.set("rotationAngle", 4.396["*"](Math.pow(10, 1["-u"]())));
+                return ρσ_d;
+            }).call(this));
+            ρσ_d.set("moon", (function(){
+                var ρσ_d = ρσ_dict();
+                ρσ_d.set("mass", 7.342["*"](Math.pow(10, 22)));
+                ρσ_d.set("radius", 1.7371["*"](Math.pow(10, 6)));
+                ρσ_d.set("omega", 2.6617["*"](Math.pow(10, 6["-u"]())));
+                ρσ_d.set("texture", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Solarsystemscope_texture_8k_moon.jpg/1280px-Solarsystemscope_texture_8k_moon.jpg");
+                ρσ_d.set("rotationAngle", 1.168["*"](Math.pow(10, 1["-u"]())));
+                return ρσ_d;
+            }).call(this));
+            return ρσ_d;
+        }).call(this);
         "31";
-        shaftwidth = earth_radius["*"](.01);
-        "32";
-        x_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(axis_length, 0, 0), color: color.blue, shaftwidth: shaftwidth})]);
-        "33";
-        y_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(0, axis_length, 0), color: color.green, shaftwidth: shaftwidth})]);
+        mode = params.mode;
         "34";
-        z_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(0, 0, axis_length), color: color.yellow, shaftwidth: shaftwidth})]);
+        planet = ρσ_getitem(planet_data, mode);
+        "35";
+        M = ρσ_getitem(planet, "mass");
         "36";
-        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: x_axis.pos["+"](x_axis.axis), text: "x", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        planet_radius = ρσ_getitem(planet, "radius");
         "37";
-        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: y_axis.pos["+"](y_axis.axis), text: "y", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        omega = ρσ_getitem(planet, "omega");
         "38";
-        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: z_axis.pos["+"](z_axis.axis), text: "z", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        rotationAngle = ρσ_getitem(planet, "rotationAngle");
         "40";
-        vx = params.vx;
-        vy = params.vy;
-        vz = params.vz;
+        planet_sphere = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), radius: planet_radius, texture: ρσ_getitem(planet, "texture")})]);
         "43";
-        speed = params.speed;
+        latitude = params.latitude;
         "44";
-        direction = vector(vx, vy, vz).norm();
-        "45";
-        velocity = direction["*"](speed);
+        longitude = params.longitude;
+        "47";
+        phi = (await radians(latitude));
         "48";
-        dt = .5;
+        lambda_ = (await radians(longitude));
         "51";
+        z = planet_radius["*"](cos(phi))["*"](cos(lambda_));
+        "52";
+        x = planet_radius["*"](cos(phi))["*"](sin(lambda_));
+        "53";
+        y = planet_radius["*"](sin(phi));
+        "56";
+        projectile_radius = planet_radius["/"](100);
+        "57";
+        projectile = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(x, y, z), radius: projectile_radius, color: color.red})]);
+        "60";
+        axis_length = planet_radius["*"](1.5);
+        "61";
+        shaftwidth = planet_radius["*"](.01);
+        "62";
+        x_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(axis_length, 0, 0), color: color.blue, shaftwidth: shaftwidth})]);
+        "63";
+        y_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(0, axis_length, 0), color: color.green, shaftwidth: shaftwidth})]);
+        "64";
+        z_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(0, 0, axis_length), color: color.yellow, shaftwidth: shaftwidth})]);
+        "66";
+        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: x_axis.pos["+"](x_axis.axis), text: "x", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        "67";
+        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: y_axis.pos["+"](y_axis.axis), text: "y", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        "68";
+        ρσ_interpolate_kwargs.call(this, label, [ρσ_desugar_kwargs({pos: z_axis.pos["+"](z_axis.axis), text: "z", xoffset: 10, yoffset: 10, space: 30, height: 20, border: 4, font: "sans"})]);
+        "70";
+        vx = params.vx;
+        "71";
+        vy = params.vy;
+        "72";
+        vz = params.vz;
+        "75";
+        speed = params.speed;
+        "76";
+        direction = vector(vx, vy, vz).norm();
+        "77";
+        velocity = direction["*"](speed);
+        "80";
+        dt = .5;
+        "83";
         tracer = ρσ_interpolate_kwargs.call(this, curve, [ρσ_desugar_kwargs({color: color.yellow})]);
-        "54";
-        tilt_angle = (await radians(23.5));
-        "55";
+        "86";
+        tilt_angle = (await radians(rotationAngle));
+        "87";
         rotation_axis = vector(sin(tilt_angle), cos(tilt_angle), 0);
-        "58";
+        "90";
         counter = 0;
-        "59";
+        "91";
         while (true) {
-            "60";
-            (await rate(1e3));
-            "63";
-            ρσ_interpolate_kwargs.call(earth, earth.rotate, [ρσ_desugar_kwargs({angle: omega["*"](dt), axis: rotation_axis})]);
-            "66";
-            r = projectile.pos["-"](1["*"](earth.pos));
-            "67";
+            "92";
+            (await rate(700));
+            "95";
+            ρσ_interpolate_kwargs.call(planet_sphere, planet_sphere.rotate, [ρσ_desugar_kwargs({angle: omega["*"](dt), axis: rotation_axis})]);
+            "98";
+            r = projectile.pos["-"](1["*"](planet_sphere.pos));
+            "99";
             r_mag = mag(r);
-            "70";
+            "101";
             g = G["*"](M)["/"](Math.pow(r_mag, 2));
-            "71";
+            "102";
             gravitational_acceleration = 1["-u"]()["*"](g)["*"](r.norm());
-            "74";
-            centrifugal_acceleration = Math.pow(omega, 2)["*"](r_mag)["*"](r.norm());
-            "77";
-            net_acceleration = gravitational_acceleration["+"](centrifugal_acceleration);
-            "80";
+            "104";
+            net_acceleration = gravitational_acceleration;
+            "106";
             velocity=velocity["+"](net_acceleration["*"](dt));
-            "83";
+            "108";
             projectile.pos=projectile.pos["+"](velocity["*"](dt));
-            "86";
+            "110";
             ρσ_interpolate_kwargs.call(tracer, tracer.append, [ρσ_desugar_kwargs({pos: projectile.pos})]);
-            "88";
+            "112";
             counter=counter["+"](1);
-            "90";
-            if (counter[">"](2) && r_mag["<"](earth_radius)) {
-                "91";
+            "114";
+            if (counter[">"](2) && r_mag["<"](planet_radius)) {
+                "115";
                 velocity = vector(0, 0, 0);
-                "92";
+                "116";
                 omega = 0;
             }
         }

@@ -11,7 +11,7 @@ def home():
     return render_template('index.html')
 
 
-# Task 1: Simple Projectile Motion
+#task1: simple projectile motion
 def compute_trajectory_1(u, theta_deg, g, h):
     theta = np.deg2rad(theta_deg)
     dt = 0.01
@@ -19,8 +19,8 @@ def compute_trajectory_1(u, theta_deg, g, h):
     vx = u * np.cos(theta)
     vy = u * np.sin(theta)
 
-    x_data = [0]
-    y_data = [h]
+    xCords = [0]
+    yCords= [h]
 
     x = 0
     y = h
@@ -30,10 +30,10 @@ def compute_trajectory_1(u, theta_deg, g, h):
         y += vy * dt - 0.5 * g * dt**2
         vy -= g * dt
         t += dt
-        x_data.append(x)
-        y_data.append(y)
+        xCords.append(x)
+        yCords.append(y)
     
-    return x_data, y_data
+    return xCords, yCords
 
 @app.route('/page1')
 def index_1():
@@ -46,10 +46,10 @@ def update_1():
     u = float(request.json['speed'])
     h = float(request.json['height'])
     
-    x_values, y_values = compute_trajectory_1(u, theta_deg, g, h)
+    xCords, yCords = compute_trajectory_1(u, theta_deg, g, h)
     
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='lines', name='Trajectory'))
+    fig.add_trace(go.Scatter(x=xCords, y=yCords, mode='lines', name='Trajectory'))
     fig.update_layout(title='Simple Projectile Motion Model',
                       xaxis_title='x (m)',
                       yaxis_title='y (m)',
@@ -60,7 +60,7 @@ def update_1():
     graphJSON = pio.to_json(fig)
     return jsonify(graphJSON)
 
-# Task 2: Exact Projectile Motion
+#task2: analytical model
 def compute_trajectory_2(g, theta_deg, u, h):
     theta = np.deg2rad(theta_deg)
     
@@ -69,14 +69,14 @@ def compute_trajectory_2(g, theta_deg, u, h):
     xa = (u**2 * np.sin(2 * theta)) / (2 * g)
     ya = h + (u**2 * np.sin(theta)**2) / (2 * g)
     
-    x_values = np.linspace(0, R, num=500)
-    y_values = h + x_values * np.tan(theta) - (g * (1 + np.tan(theta)**2) * x_values**2) / (2 * u**2)
+    xCords = np.linspace(0, R, num=500)
+    yCords = h + xCords * np.tan(theta) - (g * (1 + np.tan(theta)**2) * xCords**2) / (2 * u**2)
     
-    valid_indices = y_values >= 0
-    x_values = x_values[valid_indices]
-    y_values = y_values[valid_indices]
+    valid_indices = yCords >= 0
+    xCords = xCords[valid_indices]
+    yCords = yCords[valid_indices]
     
-    return x_values, y_values, xa, ya, T
+    return xCords, yCords, xa, ya, T
 
 @app.route('/page2')
 def index_2():
@@ -103,29 +103,32 @@ def update_2():
     graphJSON = pio.to_json(fig)
     return jsonify(graphJSON=graphJSON, time_of_flight=T)
 
-# Task 3: Launch Angles and Trajectories
+#task3
 
 def calculateMinimumLaunchAngleAndSpeed_3(X=1000, Y=300, h=0, g=9.81):
-    term1 = Y - h
-    term2 = np.sqrt(X**2 + (Y - h)**2)
-    min_u_squared = g * (term1 + term2)
+    a = Y - h
+    b = np.sqrt(X**2 + (Y - h)**2)
+    min_u_squared = g * (a + b)
     
     if min_u_squared <= 0:
-        raise ValueError("No valid solution for minimum speed.")
+        print("no min speed")
     
     min_u = np.sqrt(min_u_squared)
     
-    theta = np.arctan((term1 + term2) / X)
+    theta = np.arctan((a + b) / X)
     theta_deg = np.degrees(theta)
     return min_u, theta_deg
 
 def calculate_launch_angles_3(X=1000, Y=300, h=0, g=9.81, u=150):
+
     a = g * X**2 / (2 * u**2)
     b = -X
     c = Y - h + g * X**2 / (2 * u**2)
     discriminant = b**2 - 4 * a * c
+
     if discriminant < 0:
         return None, None
+    
     discriminant_sqrt = np.sqrt(discriminant)
     angle1_rad = np.arctan((-b + discriminant_sqrt) / (2 * a))
     angle2_rad = np.arctan((-b - discriminant_sqrt) / (2 * a))
@@ -133,33 +136,29 @@ def calculate_launch_angles_3(X=1000, Y=300, h=0, g=9.81, u=150):
     angle2_deg = np.degrees(angle2_rad)
     low_ball_angle = min(angle1_deg, angle2_deg)
     high_ball_angle = max(angle1_deg, angle2_deg)
+
     return low_ball_angle, high_ball_angle
 
 def get_trajectory_data_3(angle, u, h, g):
-    # Convert angle to radians
+
     angle_rad = np.radians(angle)
     
-    # Coefficients for the quadratic equation
     a = 0.5 * g
     b = -u * np.sin(angle_rad)
     c = -h
-    
-    # Calculate discriminant
+
     discriminant = b**2 - 4 * a * c
     if discriminant < 0:
-        return np.array([]), np.array([])  # No valid trajectory if discriminant is negative
+        return np.array([]), np.array([])  # no trajectory when disc is neg (no real sol)
     
-    # Time of flight (we only consider the positive root)
-    t_flight = (-b + np.sqrt(discriminant)) / (2 * a)
+    T = (-b + np.sqrt(discriminant)) / (2 * a)
     
-    # Generate time values and calculate corresponding x and y values
-    t_max = np.linspace(0, t_flight, num=100)
-    x_vals = u * np.cos(angle_rad) * t_max
-    y_vals = h + u * np.sin(angle_rad) * t_max - 0.5 * g * t_max**2
+    tMax = np.linspace(0, T, num=100)
+    xCords = u * np.cos(angle_rad) * tMax
+    yCords = h + u * np.sin(angle_rad) * tMax - 0.5 * g * tMax**2
     
-    # Filter out y values below 0
-    mask = y_vals >= 0
-    return x_vals[mask], y_vals[mask]
+    mask = yCords >= 0 #for formatting (so graph doesnt go below y = 0)
+    return xCords[mask], yCords[mask]
 
 def plot_projectile_trajectories_3(X=1000, Y=300, h=0, g=9.81, u=150):
     low_ball_angle, high_ball_angle = calculate_launch_angles_3(X, Y, h, g, u)
@@ -167,27 +166,25 @@ def plot_projectile_trajectories_3(X=1000, Y=300, h=0, g=9.81, u=150):
     fig = go.Figure()
 
     if low_ball_angle is not None and high_ball_angle is not None:
-        # High Ball Trajectory
+
         x_high, y_high = get_trajectory_data_3(high_ball_angle, u, h, g)
         fig.add_trace(go.Scatter(x=x_high, y=y_high, mode='lines', name=f'High Ball Trajectory ({high_ball_angle:.1f}°)'))
 
-        # Low Ball Trajectory
         x_low, y_low = get_trajectory_data_3(low_ball_angle, u, h, g)
         fig.add_trace(go.Scatter(x=x_low, y=y_low, mode='lines', name=f'Low Ball Trajectory ({low_ball_angle:.1f}°)'))
 
-    # Minimum Launch Trajectory
     min_u, theta_deg = calculateMinimumLaunchAngleAndSpeed_3(X, Y, h, g)
     x_min, y_min = get_trajectory_data_3(theta_deg, min_u, h, g)
     fig.add_trace(go.Scatter(x=x_min, y=y_min, mode='lines', name=f'Minimum Launch Trajectory ({theta_deg:.1f}°)'))
 
-    # Bounding Parabola
+    #bouding trajectory
     x_bound = np.linspace(0, 10 * X, num=100)
     y_bound = h + (u**2) / (2 * g) - (g / (2 * u**2)) * x_bound**2
-    mask_bound = y_bound >= 0  # Filter out y values below 0
+    mask_bound = y_bound >= 0  # filtering formating
     fig.add_trace(go.Scatter(x=x_bound[mask_bound], y=y_bound[mask_bound], mode='lines', name='Bounding Parabola'))
 
-    # Maximum Horizontal Distance Trajectory
-    max_horizontal_angle = np.pi / 4  # 45 degrees for maximum range
+    
+    max_horizontal_angle = np.arcsin(1/np.sqrt(2+2*g*h/(u**2)))
     max_horizontal_angle_deg = np.degrees(max_horizontal_angle)
     x_max, y_max = get_trajectory_data_3(max_horizontal_angle_deg, u, h, g)
     fig.add_trace(go.Scatter(x=x_max, y=y_max, mode='lines', name=f'Maximum Horizontal Path ({max_horizontal_angle_deg:.1f}°)'))
@@ -253,28 +250,28 @@ def compute_trajectory_4(g, theta_deg, u, h):
     xa = (u**2 * np.sin(2 * theta)) / (2 * g)
     ya = h + (u**2 * np.sin(theta)**2) / (2 * g)
     
-    x_values = np.linspace(0, R, num=500)
-    y_values = h + x_values * np.tan(theta) - (g * (1 + np.tan(theta)**2) * x_values**2) / (2 * u**2)
+    xCords = np.linspace(0, R, num=500)
+    yCords = h + xCords * np.tan(theta) - (g * (1 + np.tan(theta)**2) * xCords**2) / (2 * u**2)
     
-    valid_indices = y_values >= 0
-    x_values = x_values[valid_indices]
-    y_values = y_values[valid_indices]
+    filteredCords = yCords >= 0 #filitering
+    xCords = xCords[filteredCords]
+    yCords = yCords[filteredCords]
 
-    theta_max = np.arcsin(1 / np.sqrt(2 + 2 * g * h / u**2))
-    R_max = (u**2 / g) * (np.sin(2 * theta_max) + np.cos(theta_max) * np.sqrt(np.sin(theta_max)**2 + 2 * g * h / u**2))
-    x_values_max = np.linspace(0, R_max, num=500)
-    y_values_max = h + x_values_max * np.tan(theta_max) - (g * (1 + np.tan(theta_max)**2) * x_values_max**2) / (2 * u**2)
+    thethaMax = np.arcsin(1 / np.sqrt(2 + 2 * g * h / u**2))
+    rMax = (u**2 / g) * (np.sin(2 * thethaMax) + np.cos(thethaMax) * np.sqrt(np.sin(thethaMax)**2 + 2 * g * h / u**2))
+    xMaxCords = np.linspace(0, rMax, num=500)
+    yMaxCords = h + xMaxCords * np.tan(thethaMax) - (g * (1 + np.tan(thethaMax)**2) * xMaxCords**2) / (2 * u**2)
 
-    valid_indices_max = y_values_max >= 0
-    x_values_max = x_values_max[valid_indices_max]
-    y_values_max = y_values_max[valid_indices_max]
+    filteredMaxCords = yMaxCords >= 0
+    xMaxCords = xMaxCords[filteredMaxCords]
+    yMaxCords = yMaxCords[filteredMaxCords]
     
-    T_max = (u * np.sin(theta_max) + np.sqrt((u * np.sin(theta_max))**2 + 2 * g * h)) / g
+    TMax = (u * np.sin(thethaMax) + np.sqrt((u * np.sin(thethaMax))**2 + 2 * g * h)) / g
     
     arc_length = calculateArcLengthOfProjectile(u, theta_deg, g, h)
-    arc_length_max = calculateArcLengthOfProjectile(u, np.degrees(theta_max), g, h)
+    arc_length_max = calculateArcLengthOfProjectile(u, np.degrees(thethaMax), g, h)
     
-    return (x_values, y_values, xa, ya, T, T_max, arc_length, arc_length_max, x_values_max, y_values_max)
+    return (xCords, yCords, xa, ya, T, TMax, arc_length, arc_length_max, xMaxCords, yMaxCords)
 
 @app.route('/page4')
 def index_4():
@@ -343,18 +340,18 @@ x_red, y_red = calculate_displacements_7(t, theta_red)
 x_yellow, y_yellow = calculate_displacements_7(t, theta_yellow)
 
 # using formula to calculate min max heights times
-def calculate_double_height_times_7(u, g, angles):
-    double_height_times = []
+def compute_min_max_times_7(u, g, angles):
+    minMaxData = []
     for angle in angles:
         theta = np.deg2rad(angle)
         if np.sin(theta)**2 >= 8/(9 * 9):
             term = np.sqrt(np.sin(theta)**2 - 8/9)
             t1 = (3*u / (2*g)) * (np.sin(theta) + term)
             t2 = (3*u / (2*g)) * (np.sin(theta) - term)
-            double_height_times.append((angle, t1, t2))
-    return double_height_times
+            minMaxData.append((angle, t1, t2))
+    return minMaxData
 
-double_height_times = calculate_double_height_times_7(u, g, angles)
+double_height_times = compute_min_max_times_7(u, g, angles)
 
 # plot range vs time
 fig1 = go.Figure()
@@ -445,7 +442,7 @@ def update_7():
     fig2.data = [trace for trace in fig2.data if 'Min Max Height' not in trace.name]
 
     # Calculate and add new min max points
-    double_height_times = calculate_double_height_times_7(u, g, [angle_blue, angle_green, angle_red, angle_yellow])
+    double_height_times = compute_min_max_times_7(u, g, [angle_blue, angle_green, angle_red, angle_yellow])
 
     for angle, t1, t2 in double_height_times:
         theta = np.deg2rad(angle)
@@ -493,11 +490,10 @@ def update_animated_8():
     initial_speed = float(data.get('initial_speed', 20))
     launch_angle = float(data.get('launch_angle', 45))
 
-    # Parameters
-    g = 9.81  # Acceleration due to gravity (m/s^2)
-    dt = 0.01  # Time step (s)
+    g = 9.81  
+    dt = 0.01  
 
-    # Initial conditions
+
     v0_x = initial_speed * np.cos(np.radians(launch_angle))
     v0_y = initial_speed * np.sin(np.radians(launch_angle))
     x0, y0 = 0, 0
