@@ -483,7 +483,7 @@ def index_8():
 @app.route('/update_animated_8', methods=['POST'])
 
 def update_animated_8():
-    # Get parameters from the request
+
     data = request.json
     bounces = int(data.get('bounces', 5))
     e = float(data.get('e', 0.8))
@@ -498,11 +498,11 @@ def update_animated_8():
     v0_y = initial_speed * np.sin(np.radians(launch_angle))
     x0, y0 = 0, 0
 
-    # Arrays to store the trajectory
+
     x = [x0]
     y = [y0]
 
-    # Verlet integration with bounces
+
     vx, vy = v0_x, v0_y
     bounce_count = 0
 
@@ -515,26 +515,25 @@ def update_animated_8():
             x.append(x_new)
             y.append(y_new)
 
-        # Check for bounce
+        #check if contact with floor
         if y[-1] < 0:
-            y[-1] = 0  # Reset the y position to ground level
-            vy = -e * vy  # Apply the coefficient of restitution
+            y[-1] = 0  # reset to 0 so it doesnt goes through the floor
+            vy = -e * vy  #applying cor in the opposite direction
             bounce_count += 1
 
-    # Convert lists to numpy arrays for plotting
     x = np.array(x)
     y = np.array(y)
 
-    # Define range for the plot
+    #range for plot
     xm = np.min(x) - 1.5
     xM = np.max(x) + 1.5
     ym = np.min(y) - 1.5
     yM = np.max(y) + 1.5
 
-    # Number of frames for animation
+    #total frames of animation
     N_frames = len(x)
 
-    # Create frames for the animation
+    #creating the frames
     frames = [
         go.Frame(
             data=[
@@ -549,7 +548,7 @@ def update_animated_8():
         ) for k in range(N_frames)
     ]
 
-    # Create the figure object with specified dimensions
+    #plotting
     fig = go.Figure(
         data=[
             go.Scatter(x=x, y=y,
@@ -574,89 +573,77 @@ def update_animated_8():
         frames=frames
     )
 
-    # Convert the figure to JSON and return it
     graphJSON = fig.to_json()
     return jsonify(graphJSON)
 
 
-
-
-#Task 9
-def compute_trajectory_9(u, theta_deg, h, m, C_d, A):
-    theta = np.deg2rad(theta_deg)
-    g = 9.81
-    rho = 1.225
-    dt = 0.01
+def compute_trajectory_9(u, theta_deg, h, m, cd, A):
+    # Constants
+    g = 9.81  # Acceleration due to gravity (m/s^2)
+    rho = 1.225  # Air density (kg/m^3)
+    dt = 0.01  # Time step (s)
     
+    # Convert angle to radians
+    theta = np.deg2rad(theta_deg)
+    
+    # Coefficient of drag
+    k = 0.5 * cd * rho * A / m
+    
+    # Initial conditions with drag
     vx = u * np.cos(theta)
     vy = u * np.sin(theta)
     
-    x_data = [0]
-    y_data = [h]
-    vx_data = [vx]
-    vy_data = [vy]
-    t_data = [0]
-    
     x = 0
     y = h
     t = 0
+    
+    x_data = [x]
+    y_data = [y]
+    
     while y >= 0:
         v = np.sqrt(vx**2 + vy**2)
-        F_d = 0.5 * C_d * rho * A * v**2
-        ax = -F_d * vx / (m * v)
-        ay = -g - (F_d * vy / (m * v))
-
-        x_new = x + vx * dt + 0.5 * ax * dt**2
-        y_new = y + vy * dt + 0.5 * ay * dt**2
+        
+        # Compute accelerations
+        ax = -vx * k * v
+        ay = -g - vy * k * v
+        
+        # Update positions using Verlet integration
+        x_new = x + vx * dt + 0.5 * ax * (dt**2)
+        y_new = y + vy * dt + 0.5 * ay * (dt**2)
+        
+        # Update velocities
         vx_new = vx + ax * dt
         vy_new = vy + ay * dt
-
-        x = x_new
-        y = y_new
-        vx = vx_new
-        vy = vy_new
+        
+        # Update variables
+        x, y = x_new, y_new
+        vx, vy = vx_new, vy_new
         t += dt
-
+        
         x_data.append(x)
         y_data.append(y)
-        vx_data.append(vx)
-        vy_data.append(vy)
-        t_data.append(t)
     
+    # Trajectory without drag
     x_data_no_drag = [0]
     y_data_no_drag = [h]
+    
     vx_no_drag = u * np.cos(theta)
     vy_no_drag = u * np.sin(theta)
-    t = 0
     x = 0
     y = h
+    t = 0
+    
     while y >= 0:
         x += vx_no_drag * dt
-        y += vy_no_drag * dt - 0.5 * g * dt**2
+        y += vy_no_drag * dt - 0.5 * g * (dt**2)
         vy_no_drag -= g * dt
         t += dt
+        
         x_data_no_drag.append(x)
         y_data_no_drag.append(y)
     
-    # Calculate angle based on the formula
-    theta_red = np.arcsin(1 / np.sqrt(2 + (2 * g * h) / (u**2)))
-    vx_red = u * np.cos(theta_red)
-    vy_red = u * np.sin(theta_red)
     
-    x_data_red = [0]
-    y_data_red = [h]
-    t = 0
-    x = 0
-    y = h
-    while y >= 0:
-        x += vx_red * dt
-        y += vy_red * dt - 0.5 * g * dt**2
-        vy_red -= g * dt
-        t += dt
-        x_data_red.append(x)
-        y_data_red.append(y)
-    
-    return x_data, y_data, x_data_no_drag, y_data_no_drag, x_data_red, y_data_red
+    return x_data, y_data, x_data_no_drag, y_data_no_drag
 
 @app.route('/page9')
 def index_9():
@@ -668,14 +655,13 @@ def update_9():
     theta_deg = float(request.json['angle'])
     h = float(request.json['height'])
     m = float(request.json['mass'])
-    C_d = float(request.json['drag'])
+    cd = float(request.json['drag'])
     A = float(request.json['area'])
     
-    x_data, y_data, x_data_no_drag, y_data_no_drag, x_data_red, y_data_red = compute_trajectory_9(u, theta_deg, h, m, C_d, A)
+    x_data, y_data, x_data_no_drag, y_data_no_drag = compute_trajectory_9(u, theta_deg, h, m, cd, A)
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x_data, y=y_data, mode='lines', name='With air resistance'))
     fig.add_trace(go.Scatter(x=x_data_no_drag, y=y_data_no_drag, mode='lines', name='No air resistance', line=dict(dash='dash')))
-    fig.add_trace(go.Scatter(x=x_data_red, y=y_data_red, mode='lines', name='Red trajectory (Formula angle)', line=dict(color='red')))
     fig.update_layout(title='Projectile Motion with and without Air Resistance',
                       xaxis_title='x /m',
                       yaxis_title='y /m',
